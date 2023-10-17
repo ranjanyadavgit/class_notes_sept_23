@@ -1,0 +1,3406 @@
+
+
+$ git config --global user.name "ADAM M"
+$ git config --global user.email "scmlearningcentre@gmail.com"
+$ git config --global push.default "simple"
+
+Remote Repo: https://gitlab.com/scmlearningcentre/myawesomesep23.git
+
+$ git clone <remote> <local-dir>
+$ git clone https://gitlab.com/scmlearningcentre/myawesomesep23.git test00
+
+Git Workflow
+============
+$ git status
+$ git add <file> or git add .
+$ git commit -m "message"
+$ git log
+$ git log -num --oneline
+$ git show <commitID>
+$ git push
+$ git pull
+
+$ git reset --soft
+$ git reset --mixed
+$ git reset --hard
+
+$ git revert <commitID>
+$ git checkout <commitID>
+
+$ git branch
+$ git checkout <branch>
+$ git branch <branchname>
+
+$ git merge <source> <destination>
+$ git cherry-pick <commitID>
+
+$ git tag -a <name> -m "message" <commitID>
+$ git tag
+
+
+Owner: all access, adminster the group/project (rename,delete), create subgroups, projects, users
+Maintainer: create subgroups, projects, add users, merge approvals
+Developer: clone, push/pull
+Reporter: read-only access
+
+Java Build:
+----------
+$ apt update
+$ apt install -y git
+$ apt install -y openjdk-8-jdk
+$ export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+$ export PATH=/usr/lib/jvm/java-8-openjdk-amd64/bin:$PATH
+$ apt install -y maven
+$ java -version
+$ mvn -version
+
+
+$ git clone https://gitlab.com/scmlearningcentre/mavenbuild.git demobuild 
+$ mvn clean package - Full build
+$ mvn package - Incremental build
+
+Springboot application: 
+$ java -jar <jarfile>
+
+$ sudo cp *.war /opt/wildfly/standalone/deployments
+$ sudo /opt/wildfly/bin/standalone.sh -b 0.0.0.0 -bmanagement 0.0.0.0
+
+$ netstat -an |grep 8080
+$ ps aux | grep java
+
+----NODE PROJECT----
+Build Steps:
+ - there is no compilation
+ - unit test using a framework
+ - create a tar/zip with all the necessary *.js
+
+$ git clone https://gitlab.com/scmlearningcentre/nodebuild.git nodebuild
+$ apt install -y nodejs
+$ node -v
+$ apt install -y npm
+
+Build & Unit test:
+$ npm install mocha --save-dev
+$ npm test -> "mocha --recursive --exit"
+$ tar -cvf samplenode.tar app.js *html
+
+Deploy:
+$ tar -xvf samplenode.tar
+$ npm install --only=production
+$ npm start -> node app.js
+$ netstat -an |grep 8000
+
+EC2 server
+==========
+- AMI (OS)
+- Type (Capacity)
+- key (private password)
+- Network (Security Group)
+- Storage 
+
+Mumbai Region -> Default Network -> Default Security Group
+FQDN - Fully Qualified Domain Name
+
+whoami = the user name
+hostname = machine name
+hostname -i = ip address
+free -m = available memory
+df -kh . = available hard disk
+lscpu = available cpu
+cat /etc/os-release = gives the os details
+sudo su = switch the user to root
+
+Access Key: AKIAWLQIL5DFAUZ2UEHS
+Secret Key: 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
+
+============
+TERRAFORM
+============
+- Prone to errors
+- not scalable
+- not optimized way of using
+- immutable infra
+- not cloud agnostic
+
+IAC:
+ * desired state as a file/code
+ * version the code/file
+ * review & reuse the code/file
+
+$ sudo hostnamectl set-hostname <machinename>
+
+Install through Package:
+ $ curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+ $ sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+ $ sudo apt-get update && sudo apt-get install terraform
+
+Install specific version:
+ $ curl -O https://releases.hashicorp.com/terraform/0.15.2/terraform_0.15.2_linux_amd64.zip https://releases.hashicorp.com/terraform/
+ $ sudo apt install -y unzip
+ $ sudo unzip terraform_0.15.2_linux_amd64.zip -d /usr/local/bin/
+
+------------------TERRAFORM AWS SETUP----------
+1. Passing access/secret key as environment variables
+$ export AWS_ACCESS_KEY_ID=(your access key id)
+$ export AWS_SECRET_ACCESS_KEY=(your secret access key)
+
+2. Passing access/secret key through a credentials file
+Install AWS Cli:
+ $ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+ $ sudo apt install unzip && unzip awscliv2.zip
+ $ sudo ./aws/install --bin-dir /usr/bin --install-dir /usr/bin/aws-cli --update
+ $ aws --version
+
+Configure AWS Cli with Access/Secret Key
+ $ aws configure
+   - creates ~/.aws/credentials file
+
+HCL
+===
+ - HCL(Hashicorp Language)/ *.tf
+ - blocks { }
+ - every block will have a type & a name
+ - every statement should be in a key = value format
+
+
+   provider block
+   --------------
+   Syntax:
+   provider "providername" {
+     key = value
+   }
+
+   resource block
+   --------------
+   Syntax:
+   resource "provider_resourcetype" "name" {
+      key = value
+   }
+
+                                
+Create Infrastructure
+---------------------
+$ mkdir -p terraform/basics
+$ cd terraform/basics
+$ vi main.tf
+
+# Specify the AWS details
+provider "aws" {
+  region = "ap-south-1"
+}
+
+# Specify the EC2 details
+resource "aws_instance" "example" {
+  ami           = "ami-08e5424edfe926b43"
+  instance_type = "t2.micro"
+}
+
+Terraform Workflow
+------------------
+$ terraform init
+$ terraform validate
+$ terraform fmt
+$ terraform plan [-out planfile]
+  + indicates resource creation
+  - indicates resource deletion
+  +/- indicates resource recreation
+  ~ indicates resource modification
+$ terraform apply [planfile] -auto-approve
+$ terraform show
+$ terraform destroy
+
+INTERPOLATION: PROVIDER_RESOURCETYPE.RESOURCENAME.ATTRIBUTES
+
+Modify Infrastructure
+-------------------------
+# Specify the AWS details
+provider "aws" {
+  region = "ap-south-1"
+}
+
+# Specify the EC2 details
+resource "aws_instance" "example" {
+  ami           = "ami-03a933af70fa97ad2"
+  instance_type = "t2.micro"
+}
+
+# Create S3 bucket
+resource "aws_s3_bucket" "example" {
+  # NOTE: S3 bucket names must be unique across _all_ AWS accounts
+  bucket = "wezvatech-adam-demo-s3-sep2023"
+}
+
+$ terraform plan
+$ terraform apply -auto-approve
+$ terraform destroy
+$ terraform destroy -target aws_s3_bucket.example
+
+Implicit Dependency
+===================
+
+# Specify the AWS details
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_eip" "ip" {
+  instance = aws_instance.example.id
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0c1a7f89451184c8b"
+  instance_type = "t2.micro"
+}
+
+Explicit Dependency
+===================
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-006d3995d3a6b963b"
+  instance_type = "t2.micro"
+  depends_on = [aws_s3_bucket.example]
+}
+
+# Create S3 bucket
+resource "aws_s3_bucket" "example" {
+  bucket = "wezvatech-adam-demo-s3-sepoct2023"
+}
+
+$ terraform destroy -target aws_instance.example
+- deletes both the parent & the dependent child resources if we delete parent
+- deletes only child if we delete child resource
+
+TFSTATE File
+============
+* By default Terraform will create a local state file in the same workspace
+* This is what acts as the actual state, whereas the *.tf files gives the desired state
+
+$ vi backend.tf
+terraform{
+  backend "s3" {
+     bucket = "wezvatech-adam-demo-s3-sepoct2023"
+     key = "default/terraform.tfstate" # path & file which will hold the state #
+     region = "ap-south-1"
+  }
+}
+
+DataSource
+==========
+* This block is used to only read data from a provider
+* data block will return error if the data is not there
+
+Interpolation: DATA.DATASOURCETYPE.NAME.ATTRIBUTES
+
+Syntax:
+data "provider_datatype" "name" {
+   key = value
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_availability_zones" "example" {
+    state = "available"
+}
+
+output "azlist" {
+    value = data.aws_availability_zones.example.names
+}
+
+data "aws_instances" "test" {
+  filter {
+    name = "instance-type"
+    values = ["t2.micro","t2.small"]
+  }
+
+  instance_state_names = ["running", "stopped"]
+}
+
+output "machinelist" {
+    value = data.aws_instances.test.private_ips[0]
+}
+
+VARIABLES
+=========
+* User Variables & Output Variables
+* User variables type:
+ - string (default) - var.variablename ex: var.amiid
+ - numeric          
+ - list/array       - var.variablename[indexnumber] ex: var.amiid[0]
+ - map/hash         - var.variablename[keyname] ex: var.image_name["centos"]
+
+
+Syntax:
+-------
+variable "name" {
+   default = "defaultvalue"
+}
+
+String variables:
+----------------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "amiid" {
+  default = "ami-006d3995d3a6b963b"
+}
+
+variable "type" {
+  default = "t2.micro"
+}
+
+resource "aws_instance" "example" {
+  ami           = var.amiid
+  instance_type = var.type
+}
+	
+
+$ terraform plan -var "amiid=ami-0c6615d1e95c98aca" -var "type=t2.medium"
+$ terraform apply -auto-approve -var "amiid=ami-0c6615d1e95c98aca" -var "type=t2.medium"
+$ terraform destroy -var "amiid=ami-0c6615d1e95c98aca" -var "type=t2.medium"
+------New method for destroying from V0.15-------------
+$ terraform plan -var "amiid=ami-0c6615d1e95c98aca" -var "type=t2.medium" -out testplan
+$ terraform apply -auto-approve testplan
+
+$ terraform plan -var "amiid=ami-0c6615d1e95c98aca"  -var "type=t2.medium" -out destroyplan -destroy
+$ terraform apply -auto-approve destroyplan
+
+ -- passing values through a file to variables --
+- vi vars.tfvars
+   amiid = "ami-0c6615d1e95c98aca"
+   type = "t2.medium"
+
+$ terraform plan -var-file=vars.tfvars -out testplan3
+$ terraform apply -auto-approve testplan3
+
+$ terraform plan -var-file=vars.tfvars -out testplan4 -destroy
+$ terraform apply -auto-approve testplan4
+
+List variables:
+---------------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "amiid" {
+    type    = list
+    default = ["ami-0c6615d1e95c98aca", "ami-0c1a7f89451184c8b"]
+                  Index-0                 Index-1
+}    
+     
+variable "indexno" {
+  default = 0
+}             
+
+resource "aws_instance" "example" {
+  ami           = var.amiid[var.indexno]
+  instance_type = "t2.micro"
+}
+
+$ terraform plan -var "indexno=1" -out testplan
+$ terraform apply -auto-approve testplan
+
+$ terraform plan -var "indexno=1" -out testplan2 -destroy
+$ terraform apply -auto-approve testplan2
+
+MAP variables:
+-------------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "amiid" {
+    type    = map
+    default = {
+       "centos7" = "ami-0c6615d1e95c98aca"
+       "ubuntu" = "ami-0c1a7f89451184c8b"
+    }
+}
+
+variable "key" {
+  default = "ubuntu"
+}
+
+resource "aws_instance" "example" {
+  ami           = var.amiid[var.key]
+  instance_type = "t2.micro"
+}
+
+$ terraform plan -var "key=centos" -out testplan
+$ terraform apply -auto-approve testplan
+
+$ terraform plan -var "key=centos" -out testplan2 -destroy
+$ terraform apply -auto-approve testplan2
+
+OUTPUT variables
+================
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+data "aws_availability_zones" "example" {
+    state = "available"
+}
+
+output "azlist" {
+    value = data.aws_availability_zones.example.names
+}
+
+Import
+======
+* Importing details of resources which are managed outside the terraform
+* First add respective resource blocks to your desired state
+* Import the existing details into the state file
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+# Specify the EC2 details
+resource "aws_instance" "example1" {
+  ami           = "ami-03a933af70fa97ad2"
+  instance_type = "t2.micro"
+}
+
+resource "aws_instance" "example2" {
+  ami           = "ami-03a933af70fa97ad2"
+  instance_type = "t2.micro"
+}
+
+$ terraform import aws_instance.example2 i-0256dbffaad2d67d7
+
+
+Modules
+=======
+* Reuse the code
+* flexibility in using the code
+
+Instance module
+------------------
+$ mkdir -p modules/instance
+$ vi main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = var.amiid
+  instance_type = var.type
+}
+
+$ vi variables.tf
+variable "amiid" {
+  default = "ami-0c1a7f89451184c8b"
+}
+
+variable "type" {
+  default = "t2.micro"
+}
+
+$ vi output.tf
+output "id" {
+  value = aws_instance.example.id
+}
+
+EIP module
+----------
+$ mkdir -p modules/eip
+$ vi main.tf
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_eip" "ip" {
+  instance = var.instanceid
+}
+
+$ vi variables.tf
+
+variable "instanceid" {
+}
+
+---Root Module---
+$ cd rootmod
+$ vi main.tf
+module "instance" {
+  source = "../modules/instance"
+  amiid = var.instance_amiid
+  type = var.instance_type
+}
+
+module "eip" {
+   source = "../modules/eip"
+   instanceid = module.instance.id
+}
+
+$ vi variables.tf
+variable "instance_amiid" {
+  default = "ami-006d3995d3a6b963b"
+}
+
+variable "instance_type" {
+  default = "t2.micro"
+}
+
+Built-In functions
+==================
+$ terraform console
+max(1,31,12)
+upper("hello")
+split("a", "tomato")
+substr("hello world", 1, 4)
+index(["a", "b", "c"], "b")
+length("adam")
+length(["a", "b"])
+lookup({a="1", b="2"}, "a", "novalue")
+
+Loops
+=====
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_iam_user" "example" {
+  name = "adam"
+}
+
+======Count keyword=====
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "user_names" {
+  description = "Create IAM users with these names"
+  type        = list(string)
+  default     = ["mahesh","praveen","syed","sai","ramesh","virat"]
+}
+
+resource "aws_iam_user" "example" {
+  count = length(var.user_names)
+  name  = var.user_names[count.index] 
+}
+
+=========for_each keyword=====
+* for_each runs the resource block as a Map
+* provider_resourcetype.resourcename["each.value"]
+
+variable "user_names" {
+  description = "Create IAM users with these names"
+  type        = list(string)
+  default     = ["joy","jacob","phani","karthick","raviraj","vijay"]
+}
+
+resource "aws_iam_user" "example" {
+  for_each = toset(var.user_names)
+  name     = each.value
+}
+
+Conditions
+==========
+* Default value for count is 1, if count is > 1 then it loops the block
+* If count is 0 then the block will be skipped
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_iam_user" "example" {
+  name = "adam"
+  count = 0
+}
+
+-----------Ternary operator-----------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+variable "con" {
+   default = "0"
+}
+
+resource "aws_iam_user" "example2" {
+  count = var.con ? 1 : 2       # expression ? <true_value> : <false_value>
+  name  = "example2"
+}
+
+# expression 0 is false, expression 1 is true
+
+Provisioners
+============
+# If we want to do some initial configuration the server
+# If we want to copy some files to the server
+# If we want to run some command or script inside the server
+# If we want to run some command or script on the terraform core server
+- Provisioner blocks are child blocks for resource blocks
+
+Resource:
+ * creation time provisioner (default)
+   - first resource will get created
+   - provisioner will be called
+ * destroy time provisioner
+   - provisioner will be called first
+   - resource will be destroyed at last
+
+Local-exec Provisioner
+----------------------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+# Specify the EC2 details
+resource "aws_instance" "example" {
+  ami           = "ami-0c1a7f89451184c8b"
+  instance_type = "t2.micro"
+ 
+  provisioner "local-exec" {
+    command = "echo ${aws_instance.example.private_ip} >> private_ips.txt"
+  }
+  provisioner "local-exec" {
+    command = "exit 1"
+    on_failure = continue
+  }
+  provisioner "local-exec" {
+    when = destroy
+    command = "rm private_ips.txt"
+  }  
+}
+
+FILE PROVISIONER
+-----------------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0c1a7f89451184c8b"
+  instance_type = "t2.micro"
+  key_name      = "mastersep23"
+
+  provisioner "file" {
+    source      = "test.conf"
+    destination = "/tmp/myapp.conf"
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "ubuntu"
+    private_key = file("mastersep23.pem")
+    host     = self.public_ip
+  }
+}
+
+REMOTE-EXEC
+-----------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0c1a7f89451184c8b"
+  instance_type = "t2.micro"
+  key_name      = "mastersep23"
+
+  provisioner "local-exec" {
+    command    = "echo 'while true; do echo hi-students; sleep 5; done' > myscript.sh"
+  }
+ 
+  provisioner "file" {
+    source      = "myscript.sh"
+    destination = "/tmp/myscript.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/myscript.sh",
+      "nohup /tmp/myscript.sh 2>&1 &",
+    ]
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "ubuntu"
+    private_key = file("mastersep23.pem")
+    host     = self.public_ip
+  }
+}
+
+NULL RESOURCE
+-------------
+provider "aws" {
+  region = "ap-south-1"
+}
+
+resource "null_resource" "dummy" {
+  provisioner "local-exec" {
+    command = "touch MYFILE"
+  }
+}
+
+Best Practices
+==============
+1) Version control the changes - Environment based branching
+2) Multiple user accounts on AWS
+  - dev account for our devops development activities
+  - ops admin account for QA environment
+  - stage & prod admin account for production environment
+
+3) Use Specific version info & required providers - terraform.tf
+  terraform {
+    required_providers {
+      aws = {
+         source = "hasicorp/aws"
+         version = "~> 1.0"
+      }
+    }
+   }
+
+4) Use profiles & Alias
+
+[profilename]
+accessid=
+secretid=
+region=
+
+provider "aws" {
+  region = "ap-south-1"
+  profile = var.profile_name    # Access/Secret Key rereferred from ~/.aws/credentials #
+  alias = "mumbai"
+}
+	
+provider "aws" {
+  alias  = "virginia"               # Alias name for reference #
+  region = "us-east-1"
+  profile = "prod"
+}
+
+resource "aws_instance" "example" {
+  ami           = "ami-0742b4e673072066f"
+  instance_type = "t2.micro"
+  provider = aws.mumbai                 # Alias name to pick the provider #
+}
+resource "aws_instance" "example1" {
+  ami           = "ami-0742b4e673072066f"
+  instance_type = "t2.micro"
+  provider = aws.virginia               # Alias name to pick the provider #
+}
+
+5) DRY principle - use variables & modules
+6) Use remote state file & state-lock
+
+7) Manage terraform logs (Log level: Info, Debug, Warn, Error, Trace)
+$ export TF_LOG=TRACE
+$ export TF_LOG_PATH=/tmp/terraformlog.txt
+
+8) Dynamic Secrets
+
+# List the allowed instance type on a particular AZ
+$  aws ec2 describe-instance-type-offerings \
+    --location-type availability-zone \
+    --filters Name=location,Values=ap-south-1c \
+    --region ap-south-1 --output table
+
+=======
+ANSIBLE
+=======
+
+- Controller:
+$ sudo apt update 
+$ sudo apt install -y ansible
+$ which ansible
+$ ansible --version
+
+
+- Target Node:
+$ sudo apt update
+$ sudo apt install -y python3
+$ which python3
+$ python3 --version
+
+Inventory: /etc/ansible/hosts
+---------
+[groupname]
+<MachineName> ansible_host=<<ec2-private-ip>> ansible_user=<<ec2-user>> ansible_ssh_private_key_file=/location/of/the/keypair/your-key.pem
+
+[demo]
+node1 ansible_host=172.31.13.47 ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/masterjul23.pem
+
+[wezvatech]
+master ansible_host=172.31.33.78 ansible_user=ubuntu ansible_ssh_private_key_file=/home/ubuntu/masterjul23.pem
+
+$ sudo hostnamectl set-hostname <machinename>
+$ sudo cp hosts.cfg /etc/ansible/hosts
+
+Host-Pattern
+============
+$ ansible demo -m ping
+$ ansible wezvatech -m ping
+$ ansible node1 -m ping
+$ ansible node1,master -m ping
+$ ansible demo,master -m ping
+$ ansible demo[0] -m ping
+$ ansible all -m ping
+$ ansible all -m ping --limit "node1"
+
+ADHOC CMDS - to run a single task at a time
+==========
+$ ansible <HostPattern> -b -m <module> -a <Arbituary Options|OS-CMD>
+    hostpattern - server|group|all
+    task - module(python) + desired state
+
+$ ansible demo -m copy -a "src=dummyfile dest=/tmp/dummyfile"
+$ ansible demo -m copy -a "src=dummyfile dest=dummyfile"
+$ ansible demo -b -m package -a "name=git state=present"
+                                          present/absent/latest
+$ ansible demo -b -m package -a "name=apache2 state=present"
+$ ansible demo -b -m service -a "name=apache2 state=started"
+                                          started/stopped/restarted
+  # sudo systemctl status apache2
+  # netstat -an | grep 80
+  # curl localhost:80
+$ ansible demo -b -m user -a "name=testuser state=absent"
+  # id testuser
+$ ansible demo -m command -a "ls /tmp"
+
+$ ansible demo -m shell -a "ls /tmp | wc -l"
+   # when you need to use shell functions like pipe or redirection or background
+$ ansible demo -b -m command -a "apt update"
+
+SYNTAX:
+======
+--- # defining a ansible play
+- hosts: <hostpattern>  # begins your target section
+  become: <yes/no>      # default is no
+  connection: <ssh/winrm/local> # defaults to ssh
+  become_user: <username> # defaults to the user in the inventory file
+  gather_facts: <yes/no> # defaults to yes
+  vars:
+     <variablename>: <value>
+     <variablename>: <value>
+  tasks:
+  - name: <Name-for-task1>
+    <module>: <arbituary options>
+  - name: <Name-for-task2>
+    <module>: <arbituary options>
+    register: <variablename>
+    notify: <Name-for-task>
+  handlers:
+  - name: <Name-for-task>
+    <module>: <arbituary options>
+
+Execute a playbook
+==================
+$ ansible-playbook <playbook>.yml 
+# running in verbose mode
+$ ansible-playbook <playbook>.yml -vvvv
+# run in dry-run mode
+$ ansible-playbook <playbook>.yml --check
+
+
+Example: # ansible demo -b -m package -a "name=apache2 state=present"
+=======
+--- # Basics
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Install Apache
+    package: name=apache2 state=present
+  - name: Start Apache
+    service: name=apache2 state=started
+
+--- # Handlers
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Install Apache
+    package: name=apache2 state=present
+    notify: Restart Server
+  - name: Start Apache
+    service: name=apache2 state=restarted
+    notify: Restart Server
+  handlers:
+  - name: Restart Server
+    command: echo "reboot"
+
+--- # Multiple Handlers
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Install Apache
+    package: name=apache2 state=present
+    notify: handler2
+  - name: Start Apache
+    service: name=apache2 state=restarted
+    notify: Restart Server
+  handlers:
+  - name: Restart Server
+    command: echo "reboot"
+  - name: handler2
+    command: echo "handler2"
+
+Variables
+=========
+* Reference used to store & retrieve a value, which can be reused and change values dynamically
+* Define a variable:       variablename: value
+* Retrieve value:          {{ variablename }}
+
+Variable Scope
+--------------
+* Play: scope is local to playbook or roles
+* Global: scope to all playbooks calling a inventory group
+* Host: scope to all playbook calling a particular host
+
+--- # Variable example
+- hosts: demo
+  become: yes
+  vars:
+    pkg: apache2
+    stp: present
+    sts: started
+  tasks:
+  - name: Install {{pkg}}
+    package: name={{pkg}} state={{stp}}
+  - name: Start {{pkg}}
+    service: name={{pkg}} state={{sts}}
+
+Defining variables at runtime
+-----------------------------
+$ ansible-playbook playbook.yml -e "varname=value"
+
+Register Variable
+-----------------
+* Capture the return output from module
+
+---  # Register variable example
+- hosts: demo
+  tasks:
+  - name: print
+    command: echo HI
+    register: output         # output is a variable name
+  - debug: var=output
+  - debug: var=output.stdout # variable.attribute
+  - debug: var=output.rc
+
+Facts
+-----
+$ ansible demo -m setup
+
+--- # Print Ansible_Facts variables
+- hosts: demo
+  tasks:
+  - name: print ansible facts
+    debug: 
+      var: ansible_facts 
+
+---
+- hosts: demo
+  tasks:
+  - name: print OS Family
+    command: echo {{ansible_os_family}}
+    register: gather
+  - debug: var=gather.stdout
+
+What is Ansible Set_Fact?
+------------------------
+Using set_fact, we can store the value after preparing it on the fly using certain task like using filters or taking subpart of another variable.
+
+---
+- hosts: demo
+  vars:
+     myname: Adam
+  tasks:
+  - name: print name
+    command: echo {{myname}}
+    register: output
+  - name: set fact variable
+    set_fact: testvar={{output.stdout}}
+  - name: Create file
+    file:
+      path: /tmp/{{testvar}}
+      state: touch
+
+Global Variables
+----------------
+$ mkdir /etc/ansible/group_vars
+$ vi demo
+---
+myname: DEMOGROUP
+
+$ vi wezvatech
+---
+myname: WEZVATECHGROUP
+
+---
+- hosts: demo
+  tasks:
+  - name: print value
+    command: echo {{myname}}
+    register: output
+  - debug: var=output.stdout
+
+$ mkdir /etc/ansible/host_vars
+$ vi node1
+---
+myname: NODE1
+
+$ vi master
+---
+myname: MASTER
+
+---
+- hosts: node1
+  tasks:
+  - name: print value
+    command: echo {{myname}}
+    register: output
+  - debug: var=output.stdout
+
+Order of variable precedence:
+----------------------------
+1. cmd line variables
+2. local variables
+3. host variables
+4. group variables
+
+Loops
+=====
+* Repeat a task multiple times
+* Use "loop or with_items" as the meta-parameter
+
+---
+- hosts: demo
+  become: yes
+  tasks:
+  - name: create mani
+    user: name=mani state=present
+  - name: create jana
+    user: name=jana state=present
+  - name: create chandra
+    user: name=chandra state=present
+  - name: create gayathri
+    user: name=gayathri state=present
+  - name: create ross
+    user: name=ross state=present
+
+---
+- hosts: node1
+  become: yes
+  tasks:
+  - name: create user
+    user: name={{item}} state=present
+    loop: 
+      - raj
+      - priya
+      - chandra
+      - ramesh
+      - niranjan
+  - name: EOT
+    command: echo EOT
+
+Iterating over a list of Map
+ ----------------------------
+--- # Loop Playbook
+- hosts: node1
+  become: yes
+  tasks:
+  - name: add a list of users
+    user: name={{item.name}} groups={{item.groups}}  state=present
+    loop:
+    - { name: "testuser1", groups: "daemon" }
+    - { name: "testuser2", groups: "root" }
+
+Controlling time between iterations
+-----------------------------------
+--- # Loop Playbook
+- hosts: demo
+  tasks:
+  - name: Print message
+    debug:
+     msg: "The item is {{ item }}"
+    loop:
+     - hello
+     - Students
+     - adam
+    loop_control:
+     pause: 5
+
+Conditions
+==========
+* Use "when" as meta-parameter
+
+--- # String comparision
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Run if Ubuntu
+    command: echo "Its Ubuntu"
+    when: ansible_os_family == "Debian"
+  - name: Run if Centos
+    command: echo "Its Centos"
+    when: ansible_os_family == "RedHat"
+
+--- # numeric comparision
+- hosts: demo
+  tasks:
+  - name: print numbers
+    command: echo {{item}}
+    loop: [ 0, 2, 4, 6, 8, 10 ]
+    when: item > 5
+
+--- # boolean comparision
+- hosts: demo
+  tasks:
+  - name: Get stats
+    stat: path=/tmp/dummyfile
+    register: st                 # st.stat.exists
+  - debug: var=st
+  - name: Create file
+    command: touch /tmp/dummyfile
+    when: not st.stat.exists
+
+cond1 OR cond2
+true OR true = true
+true OR false = true
+false OR true = true
+false OR false = false
+
+---
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Run if Ubuntu
+    command: echo "Its Ubuntu"
+    when: ansible_os_family == "Debian" or ansible_pkg_mgr == "yum"
+  - name: Run if Centos
+    command: echo "Its Centos"
+    when: ansible_os_family == "RedHat"
+
+cond1 AND cond2
+true AND true = true
+true AND false = false
+false AND true = false
+false AND false = false
+
+---
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Run if Ubuntu
+    command: echo "Its Ubuntu"
+    when: ansible_os_family == "Debian" and ansible_pkg_mgr == "yum"
+  - name: Run if Centos
+    command: echo "Its Centos"
+    when: ansible_os_family == "RedHat"
+
+Ansible Strategies
+==================
+* Default - linear, task by task & for each task all the servers run in parallel
+* Forks - Forks decides maximum number of simultaneous connections that Ansible made on each Task under a single run
+        - applied at task level
+* Serial -  Serial decides the maximum number of nodes, process each tasks under a single run.
+         - applied at play level
+            Fork <= Serial
+
+---
+- hosts: demo
+  gather_facts: no
+  tasks:
+  - name: print hi
+    command: sleep 5
+  - name: EOT
+    command: sleep 5
+
+# set fork as 3 in ansible.cfg
+---
+- hosts: demo
+  tasks:
+  - name: print hi
+    command: sleep 5
+  - name: EOT
+    command: sleep 5
+
+# set serial as 3
+---
+- hosts: demo
+  serial: 3
+  tasks:
+  - name: print hi
+    command: sleep 5
+  - name: EOT
+    command: sleep 5
+
+Run_Once
+========
+---
+- hosts: demo
+  tasks:
+  - name: print
+    command: echo hi
+    run_once: true
+    delegate_to: node2
+  - name: EOT
+    command: echo EOT
+
+Error Handling
+==============
+* ansible will stop the playbook if all the machines for a task fails
+* ansible will skip the machine which gives error for the 1st tasks and runs only with the remaining servers
+
+---
+- hosts: demo   # 2 machines, 1 is not reachable
+  tasks:
+  - name: Dummy Task
+    command: echo DUMMY
+  - name: EOT
+    command: echo EOT
+
+---
+- hosts: all
+  tasks:
+  - name: Dummy Task
+    command: /bin/nosuchcmd
+  - name: EOT
+    command: echo EOT
+
+---
+- hosts: all
+  tasks:
+  - name: Dummy Task
+    command: /bin/nosuchcmd
+    ignore_errors: yes
+  - name: EOT
+    command: echo EOT
+
+---
+- hosts: demo
+  tasks:
+  - name: Dummy Task
+    command: /bin/nosuchcmd
+    ignore_errors: yes
+    register: result
+  - name: fail the play if the previous command did not succeed
+    fail: msg="Am stopping playbook"
+    when: "'ERROR' in result.msg"
+  - name: EOT
+    command: echo EOT
+
+---
+- hosts: demo
+  tasks:
+  - name: Fail task when both files are identical
+    command: diff file1 file2   # checks the files in the home dir of the user
+    register: diff_cmd
+    failed_when: diff_cmd.rc == 0 or diff_cmd.rc >= 2
+  - name: EOT
+    command: echo EOT
+
+when - this will run first & if it's true, task will execute
+failed_when - this will run after the task is executed & if its true, it will mark the task as failed
+
+Blocks
+======
+* Combine a group of tasks into a block for execution
+
+* Meta parameters can be assigned to the block of tasks:
+  -----------------------------------------------------
+---
+- hosts: demo
+  become: yes
+  tasks:
+  - name: Install git
+    package: name=git state=present
+  - name: Install Apache
+    package: name=apache2 state=present
+  - name: EOT
+    file:
+      path: /tmp/test
+      state: touch
+
+--- # using blocks
+- hosts: demo
+  tasks:
+  - name: Installing Packages
+    block:
+    - name: Install git
+      package: name=git state=present
+    - name: Install Apache
+      package: name=apache2 state=present
+    become: yes
+  - name: EOT
+    file:
+      path: /tmp/testwithblock
+      state: touch
+
+* Control how Ansible responds to task errors i.e :
+  -------------------------------------------
+
+--- # using blocks without rescue, playbook stops at first error
+- hosts: demo
+  tasks:
+  - name: Running Block of tasks
+    block:
+    - name: Task 1
+      debug: msg="I am Task 1"
+    - name: Task 2 with error
+      command: /bin/nosuchcmd
+    - name: Task 3
+      debug: msg="I am Task 3"
+  - name: EOT
+    file:
+      path: /tmp/testwithblock
+      state: touch
+
+--- # using blocks with rescue, execution calls rescue block
+- hosts: demo
+  tasks:
+  - name: Running Block of tasks
+    block:
+    - name: Task 1
+      debug: msg="I am Task 1"
+    - name: Task 2 with error
+      command: /bin/nosuchcmd
+    - name: Task 3
+      debug: msg="I am Task 3"
+    rescue:
+    - name: Print when errors
+      debug: msg="I caught an error"
+  - name: EOT
+    file:
+      path: /tmp/testwithblock
+      state: touch
+
+--- # using blocks with ignore errors, rescue block is skipped
+- hosts: demo
+  tasks:
+  - name: Running Block of tasks
+    block:
+    - name: Task 1
+      debug: msg="I am Task 1"
+    - name: Task 2 with error
+      command: /bin/nosuchcmd
+      ignore_errors: true
+    - name: Task 3
+      debug: msg="I am Task 3"
+    rescue:
+    - name: Print when errors
+      debug: msg="I caught an error"
+  - name: EOT
+    file:
+      path: /tmp/testwithblock
+      state: touch
+
+Tags
+====
+
+---
+- hosts: demo
+  tasks:
+  - name: print mahesh
+    command: echo mahesh
+    tags:
+    - mahesh
+    - grp1
+  - name: print praveen
+    command: echo praveen
+    tags:
+    - praveen
+    - grp1
+  - name: print manoj
+    command: echo manoj
+    tags:
+    - manoj
+    - grp2
+  - name: print swathi
+    command: echo swathi
+    tags:
+    - swathi
+    - grp2
+
+$ ansible-playbook tags.yml --tags <tagname>
+$ ansible-playbook tags.yml --skip-tags <tagname>
+
+Ansible Vault
+=============
+$ ansible-vault encrypt tags.yml
+$ ansible-vault edit tags.yml
+$ ansible-vault decrypt tags.yml
+
+$ ansible-playbook tags.yml --ask-vault-pass
+ # --vault-password-file <filename>
+
+Ansible Templates
+=================
+* Templating engine - Jinja
+
+---
+- hosts: all
+  tasks:
+    - name: Ansible Template Example
+      template:
+        src: test.j2
+        dest: /tmp/testfile
+
+test.j2:
+Hello {{myname}} {{ansible_all_ipv4_addresses}}
+
+Roles
+=====
+roles/
+     <name-role>/
+                 tasks/main.yml
+                 vars/main.yml
+                 handlers/main.yml
+                 template/*.j2
+
+example:
+---
+- hosts: demo
+  vars:
+    myname: DEVROLE
+  tasks:
+  - name: Print Dev Name
+    command: echo {{myname}}
+    notify: Calling Dev Handler
+  - name: Copy template
+    template: src=test.j2 dest=/tmp/testfile
+  handlers:
+  - name: Calling Dev Handler
+    debug: msg={{myname}}
+
+$ vi roles/devrole/tasks/main.yml
+- name: Print Dev Name
+  command: echo {{myname}}
+  notify: Calling Dev Handler
+- name: Copy template
+  template: src=test.j2 dest=/tmp/testfile
+
+$ vi roles/devrole/vars/main.yml
+myname: DEVROLE
+
+$ vi roles/devrole/handlers/main.yml
+- name: Calling Dev Handler
+  debug: msg={{myname}}
+
+$ vi roles/devrole/templates/test.j2
+Hello {{myname}} {{ansible_all_ipv4_addresses}}
+
+$ vi master.yml
+---
+- hosts: demo
+  roles:
+    - devrole
+
+$ vi master.yml
+---
+- hosts: demo
+  roles:
+    - { role: devrole, when: ansible_os_family == "RedHat" }
+    - { role: qarole, when: ansible_os_family == "Debian" }
+
+---
+- hosts: demo
+  pre_tasks:
+  - name: Start of the Role
+    debug: msg="PRE_TASK"
+  roles:
+    - devrole
+  post_tasks:
+  - name: End of the Role
+    debug: msg="POST_TASK"
+
+* pre-processing
+* gather facts
+* pre_tasks
+* role: vars
+* role: tasks
+* role: handlers
+* post_tasks
+
+Playbook Section:
+----------------
+Target section
+Vars section
+Tasks section
+Handlers section
+Pre_Task section
+Post_Task section
+
+Meta-Parameters:
+---------------
+notify
+when
+register
+loop
+delegate_to
+run_once
+ignore_errors
+failed_when
+tags
+
+Best Practices
+=============
+* Multiple inventory files
+  - Hosts file for each environment i.e dev, qa, stage & prod
+  - Dynamic Inventory (-i option)
+  - Run Ansible locally:
+    # use connection method as local i.e connection: local
+    # use "localhost" as the host pattern, meta-attribute "local_action"
+  - Running Ansible without an Inventory file:
+    $ ansible-playbook -i <IP>, -u <user> --key-file <pem-file>
+    # set host pattern to "all"
+  - Running Ansible against a particular machine in the group
+    # use "--limit" option and pass the node names
+
+Best Practices
+=============
+* Multiple inventory files
+  - Hosts file for each environment i.e dev, qa, stage & prod
+  - Dynamic Inventory (-i option)
+  - Run Ansible locally:
+    # use connection method as local i.e connection: local
+    # use "localhost" as the host pattern, meta-attribute "local_action"
+  - Running Ansible without an Inventory file:
+    $ ansible-playbook -i <IP>, -u <user> --key-file <pem-file>
+    # set host pattern to "all"
+  - Running Ansible against a particular machine in the group
+    # use "--limit" option and pass the node names
+
+* Secured Connections
+  - Use different user name for different server groups
+  - Enable Passwordless ssh
+    $ ssh-keygen -t rsa
+     # copy the id_rsa.pub from controller to node ~/.ssh/authorized_keys
+
+* Version control all your changes in gitlab
+  - store your playbooks, inventory files, group variables in the respective repository
+  - store your Roles into gitlab
+
+* Convert playbooks into reusable Roles
+  - Role directory structure:
+   # tasks/main.yml - list of tasks that the role executes
+   # handlers/main.yml - list of handler tasks that role needs
+   # defaults/main.yml - default variables
+   # vars/main.yml - other variables
+   # templates/*.j2 - template files which tasks uses
+   # files/* - files that tasks uses
+   # group_vars/
+   # host_vars/
+
+* Ensure Ansible tasks can be backward compatible & handle errors
+  - use block & rescue statements
+  - use variables
+
+* Secure sensitive data using ansible-vault
+
+* Use an appropriate strategy to execute the playbook against QA or Prod environment
+  (rolling update)
+
+SSL Certificates
+================
+* root certificate - CA (certificate authority)
+ - create root private key [ ca.key.pem ]
+ - certificate signing request [ ca.cert.csr ]
+ - root certificate [ ca.cert.pem ]
+* client certificate
+ - create client private key [ wezva.key.pem ]
+ - certificate signing request [ wezva.csr ]
+ - client SSL certificate [ wezva.cert.pem ]
+
+Scripts:
+ * Upgrade ansible
+
+
+   TERRAFORM                  VS          ANSIBLE
+==========================================================
+* Provisioning Cloud Infra     |       Configuration of Servers
+* Infra management             |       Configuration management
+* Maintains state file         |       there is no state file maintained
+  (Immutable Infra)                    (Mutable Infra)
+* terraform plan               |       ansible-playbook <yml> --check
+* Has a lifecycle              |       doesnt have a lifecycle
+* HCL/*.tf                     |       Python/*.yml
+
+Docker
+======
+* Container Management
+* Image Management
+
+$ sudo su
+$ apt update
+$ apt install -y docker.io
+$ systemctl status docker | systemctl start docker
+$ docker info
+$ sudo usermod -a -G docker ubuntu
+
+$ docker run --name <Cname> -it|-d -p <HP>:<CP> -v <HD>:<CD> <Image> <StartupCMD>
+ - Download the Image from registry
+ - create a new container, unique ID
+ - Start the container, execute the startup cmd
+ - attach to the container interactively
+
+- Default registry is Dockerhub
+
+$ docker images
+$ docker ps -a
+$ docker logs -f <CID|Cname>
+$ docker exec <CID|Cname> <cmd>
+$ docker start <CID|Cname>
+$ docker stop <CID|Cname>
+$ docker rm <CID|Cname>
+$ docker attach <CID|Cname>
+
+$ docker run -it centos
+$ docker run --name test00 -it centos
+$ docker run --name test01 -it centos /bin/sh
+$ docker run --name test02 -it centos echo "HI-ADAM"
+$ docker run -d --name testd centos /bin/sh -c "while true; do echo hello Adam; sleep 8; done"
+$ docker exec testd ps -ef
+$ docker exec -it testd /bin/bash
+$ docker run -it --rm centos /bin/bash
+
+$ docker run --rm --name myapache -p 80:80 -d httpd
+$ docker run --rm --name mynginx -p 8081:80 -d nginx
+$ docker run --rm --name myjenkins -p 8080:8080 -d jenkins/jenkins
+$ docker run --name c1 -it -v /tmp/host:/tmp/cont centos /bin/bash
+
+
+=======
+JENKINS
+=======
+* If you have a repetative tasks to be automated 
+ - What to do
+ - When to run
+ - Where to run
+* Execute a task with authentication & user doesnt need to know the details
+
+* Ability to run a task on a regular intervals, on demand basis and also on scenario based
+* Include various steps in the task
+* an automation instead of us - go to a server, run applications/cmds
+
+Advantages of jenkins:
+* connect & run the task automatically
+* periodically execute
+* dashboard
+* trigger a job based on a event
+* trigger on demand
+* group of machine
+
+----------------------------Setup Master-----------------------
+Install JDK 11
+$ apt update
+$ apt install -y openjdk-11-jre
+ 
+Add the repository key to the system:
+$ wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key  | sudo apt-key add -
+
+Append the Debian package repository:
+$ sudo sh -c 'echo deb https://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+Install Jenkins Package
+$ apt update
+$ apt install -y jenkins
+
+Status of Jenkins
+$ systemctl status jenkins | systemctl start jenkins
+
+$ netstat -an | grep 8080
+
+- Type the hostnamectl command :
+$ sudo hostnamectl set-hostname jenkinsmaster
+
+-------------------------Setup Slave-------------
+$ apt update
+$ apt install -y openjdk-11-jdk
+
+- Type the hostnamectl command :
+$ sudo hostnamectl set-hostname jenkinsslave
+
+Jenkins Pipeline
+================
+(series of tasks done in order on different servers)
+* Pipeline as Code - declarative
+* DSL - Groovy scripts
+  1. scripted pipeline
+  2. declarative pipeline
+* Jenkinsfile - Gitlab repository
+
+Advantages:
+- collection of multiple freestyle jobs into 1 single pipeline job
+- reuse the code
+- single job can connect to multiple servers
+- ability to call another job within a pipeline
+
+Syntax:
+------
+pipeline {
+ stages {
+   stage('stage1'){
+     agent {}
+     steps {}
+   } // end of stage1
+   stage('stage2'){
+     agent {}
+     steps {}
+   } // end of stage2
+ } // end of stages
+} // end of pipeline
+
+
+--------------------------
+pipeline {
+    agent any
+    stages {
+       stage('Stage1') {
+            steps {
+                echo 'First Stage'
+            }
+        }
+       stage('Stage2') {
+            steps {
+                echo 'Second Stage'
+            }
+        }
+   }
+}
+-------------------------------
+pipeline {
+    agent { label 'demo' }
+    stages {
+        stage('Stage1') {
+            steps {
+                echo 'First Stage'
+            }
+        }
+        stage('Stage2') {
+            steps {
+                echo 'Second Stage'
+            }
+        }
+    }
+}
+
+-------------------------------
+pipeline {
+    agent none
+    stages {
+        stage('Stage1') {
+            agent { label 'demo' }
+            steps {
+                echo 'First Stage'
+            }
+        }
+        stage('Stage2') {
+            agent any
+            steps {
+                echo 'Second Stage'
+            }
+        }
+    }
+}
+
+------------------------
+pipeline {
+    agent none
+    stages {
+        stage('Stage1') {
+            agent {
+                node {
+                    label 'demo'            
+                    customWorkspace '/tmp/jenkins'
+                }
+            }
+            steps {
+                echo 'First Stage'
+            }
+        }
+        stage('Stage2') {
+            agent any
+            steps {
+                echo 'Second Stage'
+            }
+        }
+    }
+}
+
+-----------------------------------
+pipeline {
+    agent { label 'demo' }
+    environment {
+        MYNAME = 'Adam'
+    }
+    stages {
+        stage('Stage1') {
+            steps {
+                sh " echo 'Your name: $MYNAME' "
+            }
+        }
+        stage('Stage2') {
+            steps {
+                echo env.MYNAME
+            }
+        }
+    }
+}
+
+------------------
+pipeline {
+    agent { label 'demo' }
+    environment {
+        MYNAME = 'global'
+    }
+    stages {
+        stage('Stage1') {
+            environment {
+                MYNAME = 'local'
+            }
+            steps {
+                sh "echo 'Your name: $MYNAME'"
+            }
+        }
+        stage('Stage2') {
+            steps {
+                echo env.MYNAME
+            }
+        }
+    }
+}
+
+----------------
+pipeline {
+    agent any
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Adam', description: 'Who are you?')
+        text(name: 'BIOGRAPHY', defaultValue: '', description: 'Enter some information about the person')
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+        choice(name: 'CHOICE', choices: ['One', 'Two', 'Three'], description: 'Pick something')
+        password(name: 'PASSWORD', defaultValue: 'SECRET', description: 'Enter a password')      
+        file(name: "file.properties", description: "Choose a file to upload")
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo "Hello ${params.PERSON}"
+
+                echo "Biography: ${params.BIOGRAPHY}"
+
+                echo "Toggle: ${params.TOGGLE}"
+
+                echo "Choice: ${params.CHOICE}"
+
+                echo "Password: ${params.PASSWORD}"
+            }
+        }
+    }
+}
+
+---------------------
+pipeline {
+    agent { label 'demo' }
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+    }
+    stages {
+        stage('Stage1') {
+            steps {
+                echo 'First Stage'
+            }
+        }
+   }
+}
+---------------------------
+pipeline {
+    agent { label 'demo' }
+    options {
+       retry(3)
+    }
+    stages {
+        stage('Stage1') {
+            steps {
+                sh 'exit 1'
+            }
+        }
+        stage('stage2') {
+            steps {
+               sh 'echo Stage 2'
+            }
+        }
+     }
+}
+---------------------------
+pipeline {
+    agent { label 'demo' }
+    stages {
+        stage('Stage1') {
+             options {
+               retry(3)
+             }
+            steps {
+                sh 'exit 1'
+            }
+        }
+        stage('stage2') {
+            steps {
+               sh 'echo Stage 2'
+            }
+        }
+     }
+}
+------------------
+pipeline {
+    agent { label 'demo' }
+    options {
+          timeout(time: 15, unit: 'SECONDS')
+          timestamps()
+    }
+    stages {
+        stage('Stage1') {
+            steps {
+                echo "Stage 1"
+                sh 'sleep 5'
+            }
+        }
+        stage('Stage2') {
+            steps {
+                echo "Stage 2"
+                sh 'sleep 5'
+            }
+        }
+    }
+}
+
+-------------------------------
+pipeline {
+    agent { label 'demo' }
+    stages {
+        stage('Clone Repo') {
+            steps {
+                echo 'Going to Checkout from Git'
+                git changelog: false, credentialsId: 'Gitlab', poll: false, url: 'https://gitlab.com/wezvaprojects/wezvatech-cicd.git'
+                echo 'Completed Checkout from Git'
+            }
+        }
+    }
+}
+
+--------------------------------
+pipeline {
+    agent { label 'demo' }
+    stages {
+        stage('Stage1') {
+            steps {
+              build job: 'basicstwo', parameters: [string(name: 'INV', value: 'PROD')]
+             }
+        }
+        stage('Stage2') {
+            steps {
+                echo 'Testing'
+            }
+        }
+    }
+}
+-----------------------------
+pipeline {
+    agent { label 'demo' }
+    stages {
+        stage('Stage1') {
+            steps {
+                  sh 'touch testfirst'
+                  dir('/tmp/jenkins') {
+                     sh 'touch DUMMY'
+                  }
+                  sh 'touch testlast'
+            }
+        }
+    }
+}
+-------------------------------
+pipeline {
+    agent any
+    stages {
+        stage('Stage1') {
+          steps {
+             catchError(buildResult: 'UNSTABLE', message: 'ERROR FOUND') {
+                 sh 'exit 1'
+             }
+          }
+        }
+       stage('Stage2') {
+            steps {
+                  echo 'Running Stage2'
+            }
+        }
+    }
+}
+
+---------------------------------
+pipeline {
+    agent any
+    environment { DEPLOY_TO = 'qa'}
+    stages {
+        stage('Stage1') {
+            when {
+                  environment name: 'DEPLOY_TO', value: 'qa'
+             }
+            steps {
+                  echo 'Running Stage1 for QA'
+            }
+        }
+       stage('Stage2') {
+            when {
+                  environment name: 'DEPLOY_TO', value: 'production'
+             }
+            steps {
+                  echo 'Running Stage2 for production'
+            }
+        }
+    }
+}
+--------------------------------
+pipeline {
+    agent any
+    parameters {
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+    }
+    stages {
+        stage('Stage1') {
+            when {
+                  expression { return params.TOGGLE }
+            }
+            steps {
+                  echo 'Testing'
+            }
+        }
+    }
+}
+--------------------------------
+pipeline {
+    agent any
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Adam', description: 'Who are you?')
+    }
+    stages {
+        stage('Stage1') {
+            when { equals expected: 'adam' , actual: params.PERSON }
+            steps {
+                  echo 'Hi Adam !!'
+            }
+        }
+    }
+}
+-------------------------------
+COND1 AND COND2
+True      True - True
+False     True - False
+True      False - False
+
+COND1 OR COND2
+True      True - True
+False     True - True
+True      False - True
+False     False - False
+
+pipeline {
+    agent any
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Adam', description: 'Who are you?')
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+    }
+    stages {
+        stage('Stage1') {
+            when {
+              allOf {
+                equals expected: 'adam' , actual: params.PERSON
+                expression { return params.TOGGLE }
+               }
+            }
+            steps {
+                  echo 'Hi Adam !!'
+            }
+        }
+    }
+}
+
+---------------------------
+pipeline {
+    agent any
+    parameters {
+        string(name: 'PERSON', defaultValue: 'Mr Adam', description: 'Who are you?')
+        booleanParam(name: 'TOGGLE', defaultValue: true, description: 'Toggle this value')
+    }
+    stages {
+        stage('Stage1') {
+            when {
+                anyOf {
+                   equals expected: 'adam' , actual: params.PERSON
+                   expression { return params.TOGGLE }
+                }
+             }
+            steps {
+                  echo 'Hi Adam !!'
+            }
+        }
+    }
+}
+
+----------------------
+pipeline {
+  agent any
+  stages{
+    stage('stage1'){
+      steps { echo "stage1"}
+    }
+    stage('stage2'){
+      steps { echo "stage1"}
+    }
+  }
+  post {
+    always{ echo "Post Stage"}
+  }
+}
+[O---------------------
+pipeline {
+  agent any
+  stages{
+    stage('stage1'){
+      steps { echo "stage1"}
+      post {
+         always { echo "Post Stage1" }
+      }
+    }
+    stage('stage2'){
+      steps { echo "stage2"}
+    }
+  }
+}
+
+
+Change Approval Board (CAB):
+- Date/time : maintenance window
+- Severity
+- Rollback mechanism
+- Impact to customers
+
+SCA - Static code analysis
+Checkov - scan the iac for misconfigurations and coding standard
+
+Ansible HA Project:
+ - Ensure HA for Ansible pipeline
+ - We can pass the vault credentials through the Jenkins plugin
+ - We can also pass the ssh credentials for connecting to the ansible nodes 
+  (no need for passwordless ssh or hardcoding credentials inside hosts file)
+
+ Code -> Build -> Deploy
+
+Types of Build
+--------------
+* Nightly/Full Builds:
+  - Runs periodically at an regular interval or also on need-basis
+  - Output of the full build is a full product which is a jar/war/tar/zip deliverable
+  - the deliverable is consumed by QA for functional/integration/regression/UAT testing
+  - full builds will be set for Feature branches, Integration Branch & Release Branch
+  - we take new workspace & do clean build
+NOTE: we will take/checkout the last successful CI build commit ID to run the full build
+
+* Continuous Integration Builds:
+ # purpose is to help developers identify faulty code as soon as possible (i.e tell whether code is good & whether it can be given to QA for functional testing)
+ # faster release cycles by helping in continuous testing
+ - Runs for every commit pushed to central repo
+ - CI builds will be set on Feature branches only
+ - Incremental builds, we reuse the workspace
+ - Output is to notify developers if there is a problem in the code
+
+BUILD PIPELINE
+--------------                                       
+
+pipeline {
+ agent none
+
+ stages{
+    stage('Checkout')
+    {
+      agent { label 'demo' }
+      steps {
+        git credentialsId: 'GitlabCred', url: 'https://gitlab.com/wezvatechprojects/wezvatech-cicd.git'
+      }
+     } 
+
+   stage('Build')
+    {
+      agent { label 'demo' }
+      steps {
+
+            echo "Building Jar Component ..."
+            dir ("./samplejar") {
+               sh "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; mvn package"
+            }
+
+            echo "Building War Component ..."
+            dir ("./samplewar") {
+              sh "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; mvn package"
+            }
+       }
+    }
+
+    stage('Code Coverage')
+    {
+       agent { label 'demo' }
+       steps {
+         echo "Running Code Coverage ..."
+         dir ("./samplejar") {
+           sh "mvn org.jacoco:jacoco-maven-plugin:0.5.5.201112152213:prepare-agent"
+         }
+       }
+    }
+
+    stage('Push Artifacts')
+    {
+       agent { label 'demo' }
+       steps {
+        script {
+       /* Define the Artifactory Server details */
+            def server = Artifactory.server 'wezvatechjfrog'
+            def uploadSpec = """{
+                "files": [{
+                "pattern": "samplewar/target/samplewar.war",
+                "target": "wezvatech"
+                }]
+            }"""
+
+            /* Upload the war to Artifactory repo */
+            server.upload(uploadSpec)
+        }
+       }
+    }
+
+ } // end of stages
+} // end of pipeline
+
+* Build: mvn package
+  - compilation
+  - unit test
+  - package
+* Code coverage: its a measurement of how much of code has been tested 
+   - we will know whether we need more test cases
+   - we will know whether there are dead codes
+   - For Java project we use Jacoco
+
+Install Artifactory using Docker:
+--------------------------------------
+$ mkdir -p ~/jfrog/artifactory/var/etc
+$ chmod -R 777 ~/jfrog
+$ touch ~/jfrog/artifactory/var/etc/system.yaml
+$ chown -R 1030:1030 ~/jfrog/artifactory/var
+$ docker run --name artifactory -v ~/jfrog/artifactory/var:/var/opt/jfrog/artifactory -d -p 8081:8081 -p 8082:8082 releases-docker.jfrog.io/jfrog/artifactory-oss:latest
+--**NOTE: If OSS Image is not available use the below Community Edition Image ** --
+$ docker run --name artifactory -v ~/jfrog/artifactory/var/:/var/opt/jfrog/artifactory -d -p 8081:8081 -p 8082:8082 releases-docker.jfrog.io/jfrog/artifactory-cpp-ce:latest
+
+- for jfrog artifactory default cred: admin/password
+
+GENERIC BUILD PIPELINE - FULL/CI BUILD
+---------------------------------------
+
+pipeline {
+ agent none
+
+ stages{
+    stage('Checkout')
+    {
+      agent { label 'demo' }
+      steps {
+        git credentialsId: 'GitlabCred', url: 'https://gitlab.com/wezvatechprojects/wezvatech-cicd.git'
+      }
+     } 
+
+   stage('GitLabWebHookCause') {
+      when {
+        beforeAgent true
+        triggeredBy 'GitLabWebHookCause'
+      }
+      steps {
+        echo "I am only executed when triggered by SCM push"
+        script {
+         env.BUILDTYPE = "CI"     // Set env variable to enable further Build Stages
+        }
+      }
+    }
+
+   stage('ManualTimed') {
+      when {
+        beforeAgent true
+        anyOf {
+          triggeredBy 'TimerTrigger'
+          triggeredBy cause: 'UserIdCause'
+        }
+      }
+      steps {
+        echo "I am only executed when triggered manually or timed"
+        script {
+          env.BUILDTYPE = "FULL"    // Set env variable to enable further Build Stages
+        }
+      }
+    }
+
+    stage('Validate')
+    {
+      agent { label 'demo' }
+      when {
+        environment name: 'BUILDTYPE', value: 'CI'
+        anyOf {
+           changeset "samplejar/**"
+           changeset "samplewar/**"
+        }
+      }
+      steps {
+        script {
+          env.BUILDME = "yes" // Set env variable to enable further Build Stages
+        }
+      }
+    } 
+
+   stage('Build')
+    {
+      when {
+        anyOf {
+            environment name: 'BUILDME', value: 'yes'
+            environment name: 'BUILDTYPE', value: 'FULL'
+        }
+      }
+      agent { label 'demo' }
+      
+            steps {
+
+            echo "Building Jar Component ..."
+            dir ("./samplejar") {
+               sh "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; mvn package"
+            }
+
+            echo "Building War Component ..."
+            dir ("./samplewar") {
+              sh "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64; mvn package"
+            }
+       }
+    }
+
+   stage('Code Coverage')
+    {
+      when {
+        anyOf {
+            environment name: 'BUILDME', value: 'yes'
+            environment name: 'BUILDTYPE', value: 'FULL'
+        }
+       }
+       agent { label 'demo' }
+       steps {
+         echo "Running Code Coverage ..."
+         dir ("./samplejar") {
+           sh "mvn org.jacoco:jacoco-maven-plugin:0.5.5.201112152213:prepare-agent"
+         }
+       }
+    }
+
+   stage('Stage Artifacts')
+    {
+       when {
+        anyOf {
+            environment name: 'BUILDME', value: 'yes'
+            environment name: 'BUILDTYPE', value: 'FULL'
+        }
+       }
+       agent { label 'demo' }
+       steps {
+        script {
+       /* Define the Artifactory Server details */
+            def server = Artifactory.server 'wezvatechjfrog'
+            def uploadSpec = """{
+                "files": [{
+                "pattern": "samplewar/target/samplewar.war",
+                "target": "wezvatech"
+                }]
+            }"""
+
+            /* Upload the war to Artifactory repo */
+            server.upload(uploadSpec)
+        }
+       }
+    }
+
+
+ } // end of stages
+} // end of pipeline
+
+Image Management
+----------------
+* Create Images frequently
+* Automate the Image creation
+* Faster way of creation
+
+Dockerfile
+==========
+* Special file in which we give the instructions on how to create a Docker Image.
+ - Automates the Image creation on the background
+ - uses existing layer from cache (/var/lib/docker)
+
+
+INSTRUCTION  COMMAND
+===========  =======
+FROM         <BaseImage>
+RUN          <command>
+CMD          ["executable","arg1","arg2"]    # user cmd will override the default cmd
+ENTRYPOINT   ["executable","arg1","arg2"]    # always runs default cmd, user cmd is taken as arguments
+COPY         <SRC> <DEST>                    # copies a single file
+ADD          <SRC> <DEST>                    # extract a archive or download a file from a URL
+USER         <USERNAME>                      # sets the default user
+USER nobody
+WORKDIR      <PATH>                          # sets the default workig dir
+ENV          <VARNAME>=<VALUE>               # variable visible in the image
+ARG          <VARNAME>=<VALUE>               # variable only visible in temp container, not on image
+EXPOSE       <PORT#>
+VOLUME       ["PATH"]
+
+Imagename = Reponame:Tagname # default tag is latest
+Image = <Registry>/<ImageName>:<TagName>
+
+$ docker build -t <ImageName>:<Tagname> . -f <Dockerfile-location> --build-arg <VARNAME>=<value>
+$ docker build -t myimg:b1 .
+
+Example:
+---------
+FROM ubuntu
+RUN apt -y update
+RUN apt install -y openjdk-11-jdk
+RUN touch /tmp/test
+CMD ["/bin/sh"]     # CMD ["java","-jar","test.jar", "-xms=2g","-xmx=4g"]
+COPY startup.sh /tmp/startup.sh
+ENTRYPOINT ["/tmp/startup.sh"]
+
+     #!/bin/bash
+     echo "Running Startup Script .."
+     echo $0 $1 $2
+
+ADD test.tar /tmp
+USER nobody
+WORKDIR /tmp
+ENV JAVA_HOME=/opt/jdk1.8
+ARG MYNAME=ADAM
+EXPOSE 8080
+EXPOSE 7001
+
+ARG ImgTag=latest
+FROM ubuntu:$ImgTag
+ENV JAVA_HOME=/opt/jdk1.8
+ARG MYNAME=ADAM
+RUN touch /tmp/$MYNAME
+
+Sample Dockerfile:
+------------------
+FROM ubuntu
+RUN apt -y update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata && apt-get install -y apache2 && apt-get clean && rm -rf /var/lib/apt/lists/*
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV APACHE_RUN_DIR /var/log/apache2
+EXPOSE 80
+CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+
+$ docker build -t myapache:oct23 -f Dockerfile.apache .
+
+Syntax:
+$ docker login <registry>
+$ docker tag <Image>:<tag> <registry>/<repo>/<image>:<tag>
+$ docker push <registry>/<repo>/<image>:<tag>
+
+Example:
+$ docker tag myapache:oct23 adamtravis/myapache:oct23
+$ docker push adamtravis/myapache:oct23
+
+==========
+KUBERNETES
+==========
+
+Control plane
+-------------
+* API server
+* ETCd
+* Controller
+* Scheduler
+* CodeDNS
+
+Data plane
+----------
+* kubelet
+* Kube-proxy
+* Docker daemon
+
+Setup Kubernetes (through Minikube, t2.medium i.e 2 CPU's)
+----------------
+Install Docker
+$ sudo apt update && sudo apt -y install docker.io
+
+ Install kubectl
+$ curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.23.7/bin/linux/amd64/kubectl && chmod +x ./kubectl && sudo mv ./kubectl /usr/local/bin/kubectl
+
+ Install Minikube
+$ curl -Lo minikube https://storage.googleapis.com/minikube/releases/v1.23.2/minikube-linux-amd64 && chmod +x minikube && sudo mv minikube /usr/local/bin/
+
+ Start Minikube
+$  sudo apt install conntrack
+$  minikube start --vm-driver=none
+$  minikube status
+
+KUBECTL (reads from the .kube/config file)
+-------
+$ kubectl get nodes
+$ kubectl describe node <name>
+$ kubectl <command> <type> <nameofobject>
+$ kubectl <command> -f <manifest>.yml
+
+pod1.yml
+--------
+kind: Pod                         # Object Type
+apiVersion: v1                    # API version
+metadata:                         # Set of data which describes the Object
+  name: testpod                  # Name of the Object
+spec:                             # Data which describes the state of the Object
+  containers:                     # Data which describes the Container details
+    - name: c00                   # Name of the Container
+      image: ubuntu              # Base Image which is used to create Container
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 8 ; done"]
+  restartPolicy: Never         # Defaults to Always
+
+$ kubectl apply -f pod1.yml
+$ kubectl get pods
+$ kubectl get pods -o wide
+$ kubectl delete -f pod1.yml
+$ kubectl describe pod testpod
+$ kubectl logs -f testpod
+$ kubectl exec testpod -- ps -ef
+$ kubectl exec testpod -it -- /bin/bash
+
+--------------------pod2.yml----------
+kind: Pod
+apiVersion: v1
+metadata:
+  name: testpod2
+spec:
+  containers:
+    - name: main
+      image: ubuntu
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 10 ; done"]
+    - name: sidecar
+      image: centos
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Students; sleep 10 ; done"]
+
+$ kubectl logs -f testpod2 -c main
+$ kubectl logs -f testpod2 -c sidecar
+$ kubectl exec testpod2 -c main -it -- /bin/bash
+
+-------------------pod3.yml-------------
+kind: Pod
+apiVersion: v1
+[Imetadata:
+   name: environments
+spec:
+  containers:
+    - name: c00
+      image: ubuntu
+      command: ["/bin/bash", "-c", "while true; do echo $ORG-$SESSION; sleep 5 ; done"]
+      env:               # List of environment variables to be used inside the pod
+      - name: ORG
+        value: WEZVATECH
+      - name: SESSION
+        value: PODS
+
+$ kubectl logs -f environments
+$ kubectl exec environments -- env
+
+-------------pod4.yml--------
+kind: Pod
+apiVersion: v1
+metadata:
+  name: portexpose
+spec:
+  containers:
+    - name: c00
+      image: httpd
+      ports:
+       - containerPort: 80 
+
+$ curl <podIP>:80
+
+-------------pod5.yml----------
+kind: Pod
+apiVersion: v1
+metadata:
+  name: labelspod
+  labels:                               # Specifies the Label details under it
+    myname: ADAM
+    myorg: WEZVATECH
+spec:
+    containers:
+       - name: c00
+         image: ubuntu
+         command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5 ; done"]
+
+$ kubectl get pods --show-labels
+$ kubectl get pods -l myname=ADAM
+$ kubectl label pods testpod myname=student
+$ kubectl get pods -l myname!=ADAM
+$ kubectl get pods -l 'myname in (ADAM, student)'
+$ kubectl get pods -l 'myname notin (ADAM, student)'
+$ kubectl delete pod -l 'myname in (ADAM, student)'  
+
+----------------------pod6.yml--------------
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nodelabels
+  labels:
+    env: dev
+spec: 
+    containers:
+       - name: c00
+         image: ubuntu
+         command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5 ; done"]
+    nodeSelector:      # specifies which node to run the pod
+       mynode: demonode
+
+$ kubectl label nodes ip-172-31-4-44 mynode=demonode
+
+Replication Controller Objects
+==============================
+ - Helps in replication of pods & scaling of pods
+1. pod spec/template
+2. label
+3. # of replicas
+
+* Replica set - scale & replicate
+* Deployment - scale & replicate, rollback
+  - used for deploying stateless application - frontend or application layer
+* Daemonset - used for deploying applications one per worker node - monitoring, logging, networking
+  - we do not give the replicas
+  - we cannot scale the replicas
+* Statefulset
+  - used for deploying stateful application - database, sonarqube, artifactory
+
+
+--------------deploy.yml-----
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeploy
+spec:
+   replicas: 2
+   selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     name: deployment
+   template:      # pod template
+     metadata:
+       name: testpod
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: ubuntu  # ubuntu:22.10
+          command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5; done"]
+
+$ kubectl get deploy
+$ kubectl get rs
+$ kubectl describe deploy mydeploy
+$ kubectl rollout status deploy/mydeploy
+$ kubectl rollout history deploy/mydeploy
+$ kubectl rollout undo deploy/mydeploy --to-revision=1
+
+-----daemonset----
+kind: DaemonSet      # Type of Object
+apiVersion: apps/v1
+metadata:
+  name: demodaemonset
+  labels:
+    env: demo
+spec:
+  selector:
+    matchLabels:
+      env: demo
+  template:
+    metadata:
+      labels:
+        env: demo
+    spec:
+      containers:
+      - name: demonset
+        image: ubuntu
+        command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 8 ; done"]
+
+Networking
+----------
+kind: Pod
+apiVersion: v1
+metadata:
+  name: microservice1
+spec:
+  containers:
+    - name: c00
+      image: ubuntu
+      command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5 ; done"]
+    - name: c01
+      image: httpd
+      ports:
+       - containerPort: 80
+
+$ kubectl exec microservice1 -c c00 -it -- /bin/bash
+  $ apt update && apt install -y curl
+  $ curl localhost:80
+
+kind: Pod
+apiVersion: v1
+metadata:
+  name: microservice2
+spec:
+  containers:
+    - name: c01
+      image: nginx
+      ports:
+       - containerPort: 80
+
+SERVICES
+========
+* used for accessing the application without worrying about chaning POD IP's
+* load balances the traffic
+* access the application outside the cluster
+ - clusterIP (default)
+ - nodeport
+ - loadbalancer/ingress
+ - headless
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeploy
+spec:
+   replicas: 2
+   selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: httpd
+          ports:
+           - containerPort: 80
+         
+
+------------------Service--------------------
+kind: Service                             # Defines to create Service type Object
+apiVersion: v1
+metadata:
+  name: demoservice
+spec:
+  ports:
+    - port: 80                               # Containers port exposed
+      targetPort: 80                     # Pods port
+  selector:
+    name: deployment    # Apply this service to any pods which has the specific label
+  type: ClusterIP                      
+
+$ kubectl get svc
+$ kubectl describe svc demoservice
+
+$ kubectl exec mydeploy-5858c7658d-qpmsg -it -- /bin/bash
+   -  echo "I AM POD1" >> ./htdocs/index.html
+
+---------------------
+kind: Service                             # Defines to create Service type Object
+apiVersion: v1
+metadata:
+  name: demoservice
+spec:
+  ports:
+    - port: 80                              # Containers port exposed
+      targetPort: 80               # Pods port
+  selector:
+    name: deployment               # Apply this service to any pods which has the specific label
+  type: NodePort
+  # 30000 - 32767
+
+Healthchecks
+============
+* livenessprobe
+ - container gets recreated if check fails
+* readinessprobe
+ - doesnt send the traffic to that pod
+
+- What cmd/script to run
+- how frequently to run
+- we should make sure the script is available inside the Image & it returns appropriate return code
+- 0 return indicates container is healthy, non-zero indicates container is not healthy
+
+
+------livenessprobe-----
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeploy
+spec:
+   replicas: 1
+   selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: httpd
+          ports:
+           - containerPort: 80
+          livenessProbe:                  # define the health check
+           exec:
+             command:                    # command to run periodically
+             - ls
+             - /tmp/lp
+           initialDelaySeconds: 30 # Wait for the specified time before it runs the first 
+           periodSeconds: 5        # Run the above command every 5 sec
+           timeoutSeconds: 30
+
+
+---readinessprobe---
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeploy
+spec:
+   replicas: 2
+   selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: httpd
+          ports:
+           - containerPort: 80
+          readinessProbe:    # define the health check
+           exec:
+            command:    # command to run periodically
+            - ls
+            - /tmp/rp
+           initialDelaySeconds: 30 # Wait for the specified time before it runs the first probe
+           periodSeconds: 5   # Run the above command every 5 sec
+           timeoutSeconds: 30
+
+
+Volumes
+=======
+* Volumes are Pod level
+ - emptydir: sharing volume between containers within a single pod
+ - hostpath: sharing volume between a pod & a host machine
+ - persistentvolume: sharing volume outside the cluster
+
+-------------------emptydir.yml----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myvolemptydir
+spec:
+  containers:
+  - name: c1
+    image: centos  
+    command: ["/bin/bash", "-c", "sleep 10000"]
+    volumeMounts:  # -v emptydir:"/tmp/xchange"
+      - name: xchange
+        mountPath: "/tmp/xchange"          # Path inside the container to share
+  - name: c2
+    image: centos
+    command: ["/bin/bash", "-c", "sleep 10000"]
+    volumeMounts: # -v emptydir:"/tmp/data"
+      - name: xchange
+        mountPath: "/tmp/data"
+  volumes:                                            # Definition for host
+  - name: xchange
+    emptyDir: {}
+
+$ kubectl exec myvolemptydir -c c1  -- ls /tmp/xchange
+$ kubectl exec myvolemptydir -c c2 -- ls /tmp/data
+$ kubectl exec myvolemptydir -c c1 -- touch /tmp/xchange/C1
+$ kubectl exec myvolemptydir -c c2 -- touch /tmp/data/C2
+
+---------------------hostpath.yml-------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myvolhostpath
+spec:
+  containers:
+  - image: centos
+    name: testc
+    command: ["/bin/bash", "-c", "sleep 10000"]
+    volumeMounts:
+    - mountPath: /tmp/hostpath
+      name: testvolume
+  volumes:
+  - name: testvolume
+    hostPath:
+      path: /tmp/data   # -v <hostpath>:<containerpath>
+
+-----------------------------pv.yml-------
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: myebsvol
+spec:
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  awsElasticBlockStore:
+    volumeID: 	vol-063654f1cc38e84ff
+    fsType: ext4
+
+$ kubectl get pv
+$ kubectl describe pv myebsvol
+----------------------------pvc.yml-------
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: myebsvolclaim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+$ kubectl get pvc
+$ kubectl describe pvc myebsvolclaim
+
+---------------------------------------deploypv.yml----
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pvdeploy
+spec:
+  replicas: 1
+  selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     app: mypv
+  template:
+    metadata:
+      labels:
+        app: mypv
+    spec:
+      containers:
+      - name: shell
+        image: centos
+        command: ["/bin/bash", "-c", "sleep 10000"]
+        volumeMounts:
+        - name: mypd
+          mountPath: "/tmp/persistent"
+      volumes:
+        - name: mypd
+          persistentVolumeClaim:
+            claimName: myebsvolclaim
+
+Virtual Memory
+==============
+* Configmap - application configurtion files (db host, db-user, db-table, log level, heap memory)
+* Secret - for any sensitive data, certificates (keystores, password)
+ - Size of the object should be <= 1 MB
+
+$ touch certificate; echo "YOUCANSEEME" > password.txt
+$ kubectl create secret generic mypasswd --from-file=password.txt 
+$ kubectl create secret generic mycert --from-file=certificate
+$ kubectl get secret
+$ kubectl describe secret mycert
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeployments
+spec:
+   replicas: 1
+   selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5; done"]
+          volumeMounts:
+          - name: passwdsecret
+            mountPath: "/tmp/passwd"   # the secret files will be mounted as ReadOnly by default here
+          - name: certificate
+            mountPath: "/tmp/certs"   # the secret files will be mounted as ReadOnly by default here
+      volumes:
+      - name: passwdsecret
+        secret:
+         secretName: mypasswd  
+      - name: certificate
+        secret:
+         secretName: mycert
+
+-----------------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myenvsecret
+spec:
+  containers:
+  - name: c1
+    image: centos
+    command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5 ; done"]
+    env:
+    - name: MYDBPASSWD          # env name in which value of the key is stored
+      valueFrom:
+        secretKeyRef:
+          name: mypasswd       # name of the secret created
+          key: password.txt    # name of the key
+
+$ kubectl create configmap mymap --from-file=sample.conf
+$ kubectl get cm
+$ kubectl describe configmaps mymap
+$ kubectl get configmap mymap -o yaml
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeployments
+spec:
+   replicas: 1
+   selector:      # tells the controller which pods to watch/belong to
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: ubuntu
+          command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5; done"]
+          volumeMounts:
+          - name: appconfig
+            mountPath: "/tmp/config"    
+      volumes:
+      - name: appconfig
+        configMap:
+         name: mymap   # this should match the config map name created in the first step
+         items:
+         - key: sample.conf # the name of the file used during creating the map
+           path: sample.conf
+
+
+Namespace
+==========
+apiVersion: v1
+kind: Namespace
+metadata:
+   name: demo
+   labels:
+     name: development
+
+
+$ kubectl get ns
+$ kubectl get pods -n demo
+$ kubectl apply -f pod1.yml -n demo
+$ kubectl delete -f pod1.yml -n demo
+$ kubectl config set-context $(kubectl config current-context) --namespace=demo
+$ kubectl config view | grep namespace:
+
+Pod Resources
+=============
+* requests -  the min capacity needed for starting the container
+* limits - the max capacity the container can use from the worker
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: resources
+spec:
+  containers:
+  - name: resource
+    image: centos
+    command: ["/bin/bash", "-c", "while true; do echo Hello-Adam; sleep 5 ; done"]
+    resources:                        # Describes the type of resources to be used
+      requests:
+        memory: "64Mi" # A mebibyte is 1,048,576 bytes, ex: 64Mi
+        cpu: "100m"       # CPU core split into 1000 units (milli = 1000), ex: 100m
+      limits:
+        memory: "200Mi" # ex: 128Mi
+        cpu: "200m"  # ex: 200m
+
+Init Containers
+===============
+* Before the main container starts if we need to do certain tasks i.e
+ - clone of a git repo
+ - seeding a db
+ - starting another application or service
+
+* Init containers will be created first in the pod
+* Init startup cmd/script will be executed & the container will get seized after the cmd/script completion
+* After this main container will be created
+* Init containers do not have healthcheck
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: initpod
+spec:
+  initContainers:
+  - name: init
+    image: centos
+    command: ["/bin/sh", "-c", "echo WEZVATECH-KUBERNETES > /tmp/xchange/testfile; sleep 30"]
+    volumeMounts:        
+      - name: xchange
+        mountPath: "/tmp/xchange"  
+  containers:   # main containers
+  - name: main
+    image: ubuntu
+    command: ["/bin/bash", "-c", "while true; do echo `cat /tmp/data/testfile`; sleep 5; done"]
+    volumeMounts:
+      - name: xchange
+        mountPath: "/tmp/data"
+  volumes:                            
+  - name: xchange
+    emptyDir: {}
+
+Statefulset
+===========
+* Need replicas to be created/destroyed in order
+* Need unique way to access the pods
+* Each replica should have separate PV
+
+# Creating Statefulset
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: webapp
+spec:
+  serviceName: "nginx"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: k8s.gcr.io/nginx-slim:0.8
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
+---
+# Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: nginx
+
+$ kubectl get sc
+$ kubectl get sts
+$ kubectl exec webapp-0 -- sh -c 'echo MASTER-POD-0 > /usr/share/nginx/html/index.html'
+$ kubectl exec webapp-1 -- sh -c 'echo SECONDARY-POD-1 > /usr/share/nginx/html/index.html'
+$ kubectl exec webapp-1 -- curl webapp-0.nginx  # podname.servicename
+$ kubectl exec webapp-0 -- curl webapp-1.nginx
+$ kubectl delete pvc -l app=nginx
+
+ # podname.headless-servicename
+
+          Deployment      |     Daemonset                        |  Statefulset
+          ==========            =========                           ===========
+Type:      stateless app - you need 1 replica per node           -  stateful app
+Example:   frontend app  - monitoring app, log app               - backend app
+works:     you give replicas - you dont give replicas            - you give replicas
+           all the pods gets created together - same as deployment object - in order
+Service:   load balancer                                         - headless service
+Volume:    1 PV for all replicas                                 - 1 PV per 1 replica
+
+HELM
+====
+* Its a packaging manager for kubernetes
+* Package is a collection of manifest files which defines a deployment of a application
+* Helm has a templating engine (go language)
+
+helm install package
+  - default value | uat/prod values
+
+$ curl https://get.helm.sh/helm-v3.2.3-linux-amd64.tar.gz > helm.tar.gz
+$ tar xzvf helm.tar.gz
+$ mv linux-amd64/helm /usr/local/bin
+
+$ helm repo list
+$ helm repo add stable https://charts.helm.sh/stable
+$ helm search repo jenkins
+$ helm show values stable/tomcat
+$ helm show readme stable/tomcat
+$ helm install testchart stable/tomcat
+$ helm install testchart stable/tomcat --set service.type=NodePort 
+$ helm install testchart stable/tomcat --version 0.4.0
+$ helm install testchart stable/tomcat -f values.yml
+$ helm get manifest testchart
+$ helm get values testchart
+$ helm list
+$ helm delete testchart
+$ helm upgrade testchart stable/tomcat -f values.yml
+$ helm rollback testchart 1
+$ helm history testchart
+$ helm pull --untar stable/tomcat
+
+AUTOSCALING
+===============
+* HPA (Horizontal Pod Autoscaler)
+ - a threshold of CPU/RAM
+ - HPA will scale up automatically if the average of the replicas is >= threshold
+ - 30 sec for scaleup
+ - cooling period of 5 min, scale down
+* VPA (Vertical Pod Autoscaler)
+* Cluster Autoscaler
+ - ability to add more worker nodes in the data plane
+
+$ minikube addons list
+$ minikube addons enable metrics-server
+
+
+$ kubectl top nodes
+$ kubectl top pods
+========================HPA=================
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+   name: mydeploy
+spec:
+   replicas: 1
+   selector:
+    matchLabels:
+     name: deployment
+   template:
+     metadata:
+       name: testpod8
+       labels:
+         name: deployment
+     spec:
+      containers:
+        - name: c00
+          image: httpd
+          ports:
+          - containerPort: 80
+          resources:
+            limits:
+              memory: "200Mi"
+            requests:
+              memory: "100Mi"
+
+-----------HPA------
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myhpamem
+spec:
+  maxReplicas: 5
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mydeploy
+  metrics:
+  - type: Resource
+    resource:
+      name: memory
+      targetAverageUtilization: 20  # If this doesnt work reduce the % to 2-4%
+
+To test Increase the memory, by running this inside any pod
+    $ apt update
+    $ apt install -y stress
+    $ stress --vm 1 --vm-bytes 100M
+
+   HPA                vs    VPA
+   ===                      ===
+* Used for stateless       * used for statefulset
+* You need to give min     * you dont need min/max replicas
+  & max replicas
+* It creates new replicas  * It recreates existing replicas
+* It has default of
+  5 min as cooling period  * We dont need cooling period
+
+* You dont need both HPA & VPA
+* You dont need HPA/VPA for QA cluster
+* You need Cluster Autoscaler for all Kubernetes clusters i.e QA/Stage/Prod
+
+Assignment 1:
+==========
+* Create a Terraform module for an EC2 instance
+   - AMI
+   - TYPE
+   - PEM
+   - STORAGE 
+   - # of servers
+
+Assignment 2:
+==========
+* Try to put a loop for the IAM module and create only the specific IAM policy
+  user1 - devuser
+  user2 - qauser 
+
+Assignment 3:
+==========
+* Modify ELB module to take VPC, subnet or any other necessary variables and create the Autoscaling group or servers or the load balancers inside the given VPC/Network
+* Call the ELB modue from the VPC root module and pass the necessary variables
+
+Assignment 4:
+==========
+* Modify the Ansible lab setup code to update the inventory for every new target node added
+
+Assignment 5:
+==========
+* Develop a ansible roles for install/configure Jenkins Master & Slave
